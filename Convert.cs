@@ -33,12 +33,21 @@ namespace Kesco.Lib.ConvertExtention
         /// </summary>
         private static NumberFormatInfo _sqlLiteralDecimalFormat;
 
+        private static readonly NumberFormatInfo sqlLiteralDecimalFormat;
+
         /// <summary>
         /// Свойство возвращающее формат преобразования чисел к строковому представлению, приемлемому в SQL операторах
         /// </summary>
         public static NumberFormatInfo SqlLiteralDecimalFormat
         {
-            get { return (NumberFormatInfo) _sqlLiteralDecimalFormat.Clone(); }
+            get { return (NumberFormatInfo) sqlLiteralDecimalFormat.Clone(); }
+        }
+
+        static Convert()
+        {
+            sqlLiteralDecimalFormat = (NumberFormatInfo)NumberFormatInfo.InvariantInfo.Clone();
+            sqlLiteralDecimalFormat.NumberDecimalSeparator = ".";
+            sqlLiteralDecimalFormat.NumberGroupSeparator = "";
         }
 
         /// <summary>
@@ -145,6 +154,23 @@ namespace Kesco.Lib.ConvertExtention
             string userScaleDecimal = val.ToString((scale > 0 ? "N" + scale : ""), _sqlLiteralDecimalFormat);
 
             return DecimalStr2Str(maxScaleDecimal.Length > userScaleDecimal.Length ? maxScaleDecimal : userScaleDecimal);
+        }
+
+        /// <summary>
+        /// Преобразование числа типа Decimal к строке, с указанной точностью
+        /// </summary>
+        /// <param name="val">Число</param>
+        /// <param name="scale">Точность</param>
+        /// <returns>Полученное строковое значение</returns>
+        public static string Decimal2StrInit(decimal? val, int scale)
+        {
+            var summ = val ?? 0;
+            if (Math.Round(summ, scale) == val)
+            {
+                return summ.ToString(scale > 0 ? "N" + scale : "");
+            }
+            var s = summ.ToString("G29");
+            return s;
         }
 
         /// <summary>
@@ -299,6 +325,50 @@ NumberFormatInfo.InvariantInfo.NumberGroupSeparator = {5}",
 
         #endregion
 
+        private static string Double2Str(double val)
+        {
+            return Double2Str(val, 0);
+        }
 
+        public static string Double2Str(double val, int scale)
+        {
+            if (scale < 0) scale = 0;
+
+            string maxScaleDouble = val.ToString("", sqlLiteralDecimalFormat);
+            string userScaleDouble = val.ToString((scale > 0 ? "N" + scale.ToString() : ""), sqlLiteralDecimalFormat);
+
+            return DecimalStr2Str(maxScaleDouble.Length > userScaleDouble.Length ? maxScaleDouble : userScaleDouble);
+        }
+
+        public static double Str2Double(string val, double defaultValue)
+        {
+            if (val == null || val.Length == 0) return defaultValue;
+            return Str2Double(val);
+        }
+
+        public static double Str2Double(string val)
+        {
+            return double.Parse(val.Replace(".", NumberFormatInfo.CurrentInfo.NumberDecimalSeparator));
+        }
+
+        public static string Bool2Str(bool val)
+        {
+            return val ? "1" : "0";
+        }
+
+        public static byte Bool2Byte(bool val)
+        {
+            return (byte) (val ? 1 : 0);
+        }
+
+        public static string Object2Str(object val)
+        {
+            if (val is bool) return Bool2Str((bool)val);
+            else if (val is decimal) return Decimal2Str((decimal)val);
+            else if (val is double || val is float) return Double2Str((double)val);
+            else if (val is DateTime) return DateTime2Str((DateTime)val);
+            else if (val is StringCollection) return Collection2Str((StringCollection)val);
+            else return val.ToString();
+        }
     }
 }
