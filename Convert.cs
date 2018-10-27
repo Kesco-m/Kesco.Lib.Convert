@@ -330,6 +330,12 @@ NumberFormatInfo.InvariantInfo.NumberGroupSeparator = {5}",
             return Double2Str(val, 0);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="scale"></param>
+        /// <returns></returns>
         public static string Double2Str(double val, int scale)
         {
             if (scale < 0) scale = 0;
@@ -340,27 +346,53 @@ NumberFormatInfo.InvariantInfo.NumberGroupSeparator = {5}",
             return DecimalStr2Str(maxScaleDouble.Length > userScaleDouble.Length ? maxScaleDouble : userScaleDouble);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public static double Str2Double(string val, double defaultValue)
         {
             if (val == null || val.Length == 0) return defaultValue;
             return Str2Double(val);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
         public static double Str2Double(string val)
         {
             return double.Parse(val.Replace(".", NumberFormatInfo.CurrentInfo.NumberDecimalSeparator));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
         public static string Bool2Str(bool val)
         {
             return val ? "1" : "0";
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
         public static byte Bool2Byte(bool val)
         {
             return (byte) (val ? 1 : 0);
         }
 
+        /// <summary>
+        ///  
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
         public static string Object2Str(object val)
         {
             if (val is bool) return Bool2Str((bool)val);
