@@ -9,72 +9,72 @@ using System.Threading;
 namespace Kesco.Lib.ConvertExtention
 {
     /// <summary>
-    /// Класс реализующий методы конвертации и приведения
+    ///     Класс реализующий методы конвертации и приведения
     /// </summary>
     public class Convert
     {
         /// <summary>
-        /// Шаблон регулярного выражения "[A-ZА-Я0-9_]+" - используется для проверки ключа в коллекции
+        ///     Шаблон регулярного выражения "[A-ZА-Я0-9_]+" - используется для проверки ключа в коллекции
         /// </summary>
         public static Regex regex4KeysCollection = new Regex("[A-ZА-Я0-9_]+", RegexOptions.IgnoreCase);
 
         /// <summary>
-        /// Шаблон регулярного выражения "-?\\d+" - только числа
+        ///     Шаблон регулярного выражения "-?\\d+" - только числа
         /// </summary>
         public static Regex regex4IntCollection = new Regex("-?\\d+", RegexOptions.IgnoreCase);
 
         /// <summary>
-        /// Шаблон регулярного выражения "-?\\d+" - используется для проверки значений в коллекции при приведении к строке
+        ///     Шаблон регулярного выражения "-?\\d+" - используется для проверки значений в коллекции при приведении к строке
         /// </summary>
-        public static Regex regex4DefaultCollection = new Regex("-?\\d+|[_a-z0-9]+|[_а-я0-9]+", RegexOptions.IgnoreCase);
+        public static Regex regex4DefaultCollection =
+            new Regex("-?\\d+|[_a-z0-9]+|[_а-я0-9]+", RegexOptions.IgnoreCase);
 
         /// <summary>
-        /// Формат преобразования чисел к строковому представлению, приемлемому в SQL операторах
+        ///     Формат преобразования чисел к строковому представлению, приемлемому в SQL операторах
         /// </summary>
-        private static NumberFormatInfo _sqlLiteralDecimalFormat;
-
         private static readonly NumberFormatInfo sqlLiteralDecimalFormat;
 
+        static Convert()
+        {
+            sqlLiteralDecimalFormat = (NumberFormatInfo) NumberFormatInfo.InvariantInfo.Clone();
+            sqlLiteralDecimalFormat.NumberDecimalSeparator = ".";
+            sqlLiteralDecimalFormat.NumberGroupSeparator = "";
+        }
+
         /// <summary>
-        /// Свойство возвращающее формат преобразования чисел к строковому представлению, приемлемому в SQL операторах
+        ///     Свойство возвращающее формат преобразования чисел к строковому представлению, приемлемому в SQL операторах
         /// </summary>
         public static NumberFormatInfo SqlLiteralDecimalFormat
         {
             get { return (NumberFormatInfo) sqlLiteralDecimalFormat.Clone(); }
         }
 
-        static Convert()
-        {
-            sqlLiteralDecimalFormat = (NumberFormatInfo)NumberFormatInfo.InvariantInfo.Clone();
-            sqlLiteralDecimalFormat.NumberDecimalSeparator = ".";
-            sqlLiteralDecimalFormat.NumberGroupSeparator = "";
-        }
-
         /// <summary>
-        /// Преобразование коллекции к строке с разделителем ','
+        ///     Преобразование коллекции к строке с разделителем ','
         /// </summary>
         /// <param name="col">Коллекция строк</param>
         /// <returns>Представление коллекции ввиде строки</returns>
         public static string Collection2Str(StringCollection col)
         {
             var b = new StringBuilder();
-            for (int i = 0; i < col.Count; i++)
+            for (var i = 0; i < col.Count; i++)
             {
                 if (i > 0) b.Append(",");
                 b.Append(col[i]);
             }
+
             return b.ToString();
         }
 
         /// <summary>
-        /// Преобразование коллекции к строке с разделителем ','
+        ///     Преобразование коллекции к строке с разделителем ','
         /// </summary>
         public static string Collection2Str(IEnumerable<string> col)
         {
             if (col != null)
             {
                 var b = new StringBuilder();
-                int counter = 0;
+                var counter = 0;
                 foreach (var c in col)
                 {
                     if (counter > 0) b.Append(",");
@@ -82,13 +82,15 @@ namespace Kesco.Lib.ConvertExtention
 
                     counter++;
                 }
+
                 return b.ToString();
             }
+
             return "";
         }
 
         /// <summary>
-        /// Преобразование строки в коллекцию строк, в качестве разделителя используется ','
+        ///     Преобразование строки в коллекцию строк, в качестве разделителя используется ','
         /// </summary>
         /// <param name="val">Строка, которую необходимо преобразовать</param>
         /// <returns>Коллекция строк</returns>
@@ -98,7 +100,7 @@ namespace Kesco.Lib.ConvertExtention
         }
 
         /// <summary>
-        /// Преобразование строки в коллекцию строк, в качестве разделителя используется переданный шаблон
+        ///     Преобразование строки в коллекцию строк, в качестве разделителя используется переданный шаблон
         /// </summary>
         /// <param name="val">Строка, которую необходимо преобразовать</param>
         /// <param name="regex">Регулярное выражение</param>
@@ -106,32 +108,33 @@ namespace Kesco.Lib.ConvertExtention
         public static StringCollection Str2Collection(string val, Regex regex)
         {
             var col = new StringCollection();
-            MatchCollection m = regex.Matches(val);
+            var m = regex.Matches(val);
 
-            for (int i = 0; i < m.Count; i++)
+            for (var i = 0; i < m.Count; i++)
             {
                 if (col.Contains(m[i].Value)) continue;
                 col.Add(m[i].Value);
             }
+
             return col;
         }
 
 
         /// <summary>
-        /// Преобразует секунды в строку формата HH:MM:SS
+        ///     Преобразует секунды в строку формата HH:MM:SS
         /// </summary>
         /// <param name="s">Количество секунд</param>
         /// <returns>Представление целого в указанном формате времени</returns>
         public static string Second2TimeFormat(int s)
         {
-            var hours = s/3600;
-            var mins = (s%3600)/60;
-            var secs = s%60;
+            var hours = s / 3600;
+            var mins = s % 3600 / 60;
+            var secs = s % 60;
             return hours + ":" + mins.ToString("d2") + ":" + secs.ToString("d2");
         }
 
         /// <summary>
-        /// Преобразование числа типа Decimal к строке, с точностью 0
+        ///     Преобразование числа типа Decimal к строке, с точностью 0
         /// </summary>
         /// <param name="val">Число</param>
         /// <returns>Полученное строковое значение</returns>
@@ -141,7 +144,7 @@ namespace Kesco.Lib.ConvertExtention
         }
 
         /// <summary>
-        /// Преобразование числа типа Decimal к строке, с указанной точностью
+        ///     Преобразование числа типа Decimal к строке, с указанной точностью
         /// </summary>
         /// <param name="val">Число</param>
         /// <param name="scale">Точность</param>
@@ -150,14 +153,16 @@ namespace Kesco.Lib.ConvertExtention
         {
             if (scale < 0) scale = 0;
 
-            string maxScaleDecimal = val.ToString("", _sqlLiteralDecimalFormat);
-            string userScaleDecimal = val.ToString((scale > 0 ? "N" + scale : ""), _sqlLiteralDecimalFormat);
+            var maxScaleDecimal = val.ToString("", sqlLiteralDecimalFormat);
+            var userScaleDecimal = val.ToString(scale > 0 ? "N" + scale : "", sqlLiteralDecimalFormat);
 
-            return DecimalStr2Str(maxScaleDecimal.Length > userScaleDecimal.Length ? maxScaleDecimal : userScaleDecimal);
+            return DecimalStr2Str(maxScaleDecimal.Length > userScaleDecimal.Length
+                ? maxScaleDecimal
+                : userScaleDecimal);
         }
 
         /// <summary>
-        /// Преобразование числа типа Decimal к строке, с указанной точностью
+        ///     Преобразование числа типа Decimal к строке, с указанной точностью
         /// </summary>
         /// <param name="val">Число</param>
         /// <param name="scale">Точность</param>
@@ -165,22 +170,19 @@ namespace Kesco.Lib.ConvertExtention
         public static string Decimal2StrInit(decimal? val, int scale)
         {
             var summ = val ?? 0;
-            if (Math.Round(summ, scale) == val)
-            {
-                return summ.ToString(scale > 0 ? "N" + scale : "");
-            }
+            if (Math.Round(summ, scale) == val) return summ.ToString(scale > 0 ? "N" + scale : "");
             var s = summ.ToString("G29");
             return s;
         }
 
         /// <summary>
-        /// Вспомогательная функция преобразования числа в строку, проверяет строку на соответствие шаблону
+        ///     Вспомогательная функция преобразования числа в строку, проверяет строку на соответствие шаблону
         /// </summary>
         /// <param name="s">Число преобразованное в строку</param>
         /// <returns>Полученное строковое значение</returns>
         private static string DecimalStr2Str(string s)
         {
-            Match m = Regex.Match(s, "[.]\\d*(0+)$", RegexOptions.RightToLeft);
+            var m = Regex.Match(s, "[.]\\d*(0+)$", RegexOptions.RightToLeft);
             if (m.Success) s = s.Remove(m.Groups[1].Index, m.Groups[1].Length);
             m = Regex.Match(s, "[.]$");
             if (m.Success) s = s.Remove(m.Index, 1);
@@ -190,7 +192,7 @@ namespace Kesco.Lib.ConvertExtention
         }
 
         /// <summary>
-        /// Преобразование строки к Decimal на основе настроек корпоративной культуры
+        ///     Преобразование строки к Decimal на основе настроек корпоративной культуры
         /// </summary>
         /// <param name="val">Строка, которую необходимо преобразовать</param>
         /// <param name="defaultValue">Значение, которое вернет функция, если преобразование закончится неудачно</param>
@@ -202,13 +204,13 @@ namespace Kesco.Lib.ConvertExtention
         }
 
         /// <summary>
-        /// Преобразование строки к Decimal на основе настроек корпоративной культуры
+        ///     Преобразование строки к Decimal на основе настроек корпоративной культуры
         /// </summary>
         /// <param name="val">Строка, которую необходимо преобразовать</param>
         /// <returns>Полученное число</returns>
         public static decimal Str2Decimal(string val)
         {
-            string cultureInfo = String.Format(
+            var cultureInfo = string.Format(
                 @"Thread.CurrentThread.CurrentCulture = {0},
 Thread.CurrentThread.CurrentUICulture = {1},
 NumberFormatInfo.CurrentInfo.NumberDecimalSeparator = {2},
@@ -221,7 +223,7 @@ NumberFormatInfo.InvariantInfo.NumberGroupSeparator = {5}",
                 NumberFormatInfo.CurrentInfo.NumberGroupSeparator,
                 NumberFormatInfo.InvariantInfo.NumberDecimalSeparator,
                 NumberFormatInfo.InvariantInfo.NumberGroupSeparator
-                );
+            );
 
             try
             {
@@ -232,15 +234,12 @@ NumberFormatInfo.InvariantInfo.NumberGroupSeparator = {5}",
                 nfi.NumberDecimalSeparator = ".";
                 nfi.NumberGroupSeparator = " ";
 
-                Double dbl;
-                if (Double.TryParse(val, NumberStyles.Any, nfi, out dbl))
-                    return (Decimal) dbl;
-                else
-                {
-                    nfi = (NumberFormatInfo) NumberFormatInfo.CurrentInfo.Clone();
-                    nfi.NumberDecimalSeparator = ".";
-                    return System.Convert.ToDecimal(val.Replace(" ", ""), nfi);
-                }
+                double dbl;
+                if (double.TryParse(val, NumberStyles.Any, nfi, out dbl)) return (decimal) dbl;
+
+                nfi = (NumberFormatInfo) NumberFormatInfo.CurrentInfo.Clone();
+                nfi.NumberDecimalSeparator = ".";
+                return System.Convert.ToDecimal(val.Replace(" ", ""), nfi);
             }
             catch (Exception)
             {
@@ -250,7 +249,7 @@ NumberFormatInfo.InvariantInfo.NumberGroupSeparator = {5}",
         }
 
         /// <summary>
-        /// Преобразование даты и времени к строке в формате ISO
+        ///     Преобразование даты и времени к строке в формате ISO
         /// </summary>
         /// <param name="val">Объект Дата/время</param>
         /// <returns>Полученное строковое значение</returns>
@@ -260,7 +259,7 @@ NumberFormatInfo.InvariantInfo.NumberGroupSeparator = {5}",
         }
 
         /// <summary>
-        /// Преобразование строки(в формате ISO) к объекту типа Datetime
+        ///     Преобразование строки(в формате ISO) к объекту типа Datetime
         /// </summary>
         /// <param name="val">Строка, которую необходимо преобразовать</param>
         /// <param name="defaultValue">Значение, которое вернет функция, если преобразование закончится неудачно</param>
@@ -272,7 +271,7 @@ NumberFormatInfo.InvariantInfo.NumberGroupSeparator = {5}",
         }
 
         /// <summary>
-        /// Преобразование строки(в формате ISO) к объекту типа Datetime
+        ///     Преобразование строки(в формате ISO) к объекту типа Datetime
         /// </summary>
         /// <param name="val">Строка, которую необходимо преобразовать</param>
         /// <returns>Полученный объект типа Datetime</returns>
@@ -282,13 +281,85 @@ NumberFormatInfo.InvariantInfo.NumberGroupSeparator = {5}",
                 return DateTime.Parse(DateTime.MinValue.ToString("yyyy.MM.dd") + " " + val);
 
             return DateTime.ParseExact(val.PadRight(14, '0'), "yyyyMMddHHmmss",
-                                       CultureInfo.InvariantCulture);
+                CultureInfo.InvariantCulture);
+        }
+
+        private static string Double2Str(double val)
+        {
+            return Double2Str(val, 0);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="scale"></param>
+        /// <returns></returns>
+        public static string Double2Str(double val, int scale)
+        {
+            if (scale < 0) scale = 0;
+
+            var maxScaleDouble = val.ToString("", sqlLiteralDecimalFormat);
+            var userScaleDouble = val.ToString(scale > 0 ? "N" + scale : "", sqlLiteralDecimalFormat);
+
+            return DecimalStr2Str(maxScaleDouble.Length > userScaleDouble.Length ? maxScaleDouble : userScaleDouble);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        public static double Str2Double(string val, double defaultValue)
+        {
+            if (val == null || val.Length == 0) return defaultValue;
+            return Str2Double(val);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static double Str2Double(string val)
+        {
+            return double.Parse(val.Replace(".", NumberFormatInfo.CurrentInfo.NumberDecimalSeparator));
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static string Bool2Str(bool val)
+        {
+            return val ? "1" : "0";
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static byte Bool2Byte(bool val)
+        {
+            return (byte) (val ? 1 : 0);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static string Object2Str(object val)
+        {
+            if (val is bool) return Bool2Str((bool) val);
+            if (val is decimal) return Decimal2Str((decimal) val);
+            if (val is double || val is float) return Double2Str((double) val);
+            if (val is DateTime) return DateTime2Str((DateTime) val);
+            if (val is StringCollection) return Collection2Str((StringCollection) val);
+            return val.ToString();
         }
 
         #region Округление
 
         /// <summary>
-        /// Функция математического округления
+        ///     Функция математического округления
         /// </summary>
         /// <param name="numToRound">Число, которое необходимо округлить</param>
         /// <param name="numOfDec">Точность, с которой необходимо выполнить округление</param>
@@ -299,7 +370,7 @@ NumberFormatInfo.InvariantInfo.NumberGroupSeparator = {5}",
         }
 
         /// <summary>
-        /// Функция математического округления
+        ///     Функция математического округления
         /// </summary>
         /// <param name="numToRound">Число, которое необходимо округлить</param>
         /// <param name="numOfDec">Точность, с которой необходимо выполнить округление</param>
@@ -310,7 +381,7 @@ NumberFormatInfo.InvariantInfo.NumberGroupSeparator = {5}",
         }
 
         /// <summary>
-        /// Функция математического округления
+        ///     Функция математического округления
         /// </summary>
         /// <param name="numToRound">Число, которое необходимо округлить</param>
         /// <param name="numOfDec">Точность, с которой необходимо выполнить округление</param>
@@ -324,83 +395,5 @@ NumberFormatInfo.InvariantInfo.NumberGroupSeparator = {5}",
         }
 
         #endregion
-
-        private static string Double2Str(double val)
-        {
-            return Double2Str(val, 0);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="val"></param>
-        /// <param name="scale"></param>
-        /// <returns></returns>
-        public static string Double2Str(double val, int scale)
-        {
-            if (scale < 0) scale = 0;
-
-            string maxScaleDouble = val.ToString("", sqlLiteralDecimalFormat);
-            string userScaleDouble = val.ToString((scale > 0 ? "N" + scale.ToString() : ""), sqlLiteralDecimalFormat);
-
-            return DecimalStr2Str(maxScaleDouble.Length > userScaleDouble.Length ? maxScaleDouble : userScaleDouble);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="val"></param>
-        /// <param name="defaultValue"></param>
-        /// <returns></returns>
-        public static double Str2Double(string val, double defaultValue)
-        {
-            if (val == null || val.Length == 0) return defaultValue;
-            return Str2Double(val);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="val"></param>
-        /// <returns></returns>
-        public static double Str2Double(string val)
-        {
-            return double.Parse(val.Replace(".", NumberFormatInfo.CurrentInfo.NumberDecimalSeparator));
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="val"></param>
-        /// <returns></returns>
-        public static string Bool2Str(bool val)
-        {
-            return val ? "1" : "0";
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="val"></param>
-        /// <returns></returns>
-        public static byte Bool2Byte(bool val)
-        {
-            return (byte) (val ? 1 : 0);
-        }
-
-        /// <summary>
-        ///  
-        /// </summary>
-        /// <param name="val"></param>
-        /// <returns></returns>
-        public static string Object2Str(object val)
-        {
-            if (val is bool) return Bool2Str((bool)val);
-            else if (val is decimal) return Decimal2Str((decimal)val);
-            else if (val is double || val is float) return Double2Str((double)val);
-            else if (val is DateTime) return DateTime2Str((DateTime)val);
-            else if (val is StringCollection) return Collection2Str((StringCollection)val);
-            else return val.ToString();
-        }
     }
 }
