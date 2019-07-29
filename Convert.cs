@@ -44,10 +44,7 @@ namespace Kesco.Lib.ConvertExtention
         /// <summary>
         ///     Свойство возвращающее формат преобразования чисел к строковому представлению, приемлемому в SQL операторах
         /// </summary>
-        public static NumberFormatInfo SqlLiteralDecimalFormat
-        {
-            get { return (NumberFormatInfo) sqlLiteralDecimalFormat.Clone(); }
-        }
+        public static NumberFormatInfo SqlLiteralDecimalFormat => (NumberFormatInfo) sqlLiteralDecimalFormat.Clone();
 
         /// <summary>
         ///     Преобразование коллекции к строке с разделителем ','
@@ -64,6 +61,17 @@ namespace Kesco.Lib.ConvertExtention
             }
 
             return b.ToString();
+        }
+
+
+        /// <summary>
+        ///     Преобразование строки к int nullable
+        /// </summary>
+        public static int? Str2IntNullable(string val)
+        {
+            int i;
+            if (int.TryParse(val, out i)) return i;
+            return null;
         }
 
         /// <summary>
