@@ -156,13 +156,14 @@ namespace Kesco.Lib.ConvertExtention
         /// </summary>
         /// <param name="val">Число</param>
         /// <param name="scale">Точность</param>
+        /// <param name="sqlFormat">Формат</param>
         /// <returns>Полученное строковое значение</returns>
-        public static string Decimal2Str(decimal val, int scale)
+        public static string Decimal2Str(decimal val, int scale, bool sqlFormat = true)
         {
             if (scale < 0) scale = 0;
-
-            var maxScaleDecimal = val.ToString("", sqlLiteralDecimalFormat);
-            var userScaleDecimal = val.ToString(scale > 0 ? "N" + scale : "", sqlLiteralDecimalFormat);
+            var format = sqlFormat ? sqlLiteralDecimalFormat : NumberFormatInfo.CurrentInfo;
+            var maxScaleDecimal = val.ToString("", format);
+            var userScaleDecimal = val.ToString(scale > 0 ? "N" + scale : "", format);
 
             return DecimalStr2Str(maxScaleDecimal.Length > userScaleDecimal.Length
                 ? maxScaleDecimal
