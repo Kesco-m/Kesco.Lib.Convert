@@ -13,6 +13,23 @@ namespace Kesco.Lib.ConvertExtention
     /// </summary>
     public class Convert
     {
+
+        /// <summary>
+        /// Преобразование версии библиотеки к int
+        /// </summary>
+        /// <param name="version">Номер версии</param>
+        /// <returns></returns>
+        public static int VersionToInt(Version version)
+        {
+            int versionInteger =  int.Parse(version.Major.ToString().PadRight(6,'0'))
+                                + int.Parse(version.Minor.ToString().PadRight(6, '0'))
+                                + int.Parse(version.Build.ToString().PadRight(6, '0')) 
+                                + version.Revision;
+
+            return versionInteger;
+        }
+
+
         /// <summary>
         ///     Шаблон регулярного выражения "[A-ZА-Я0-9_]+" - используется для проверки ключа в коллекции
         /// </summary>
